@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sales Journal</title>
+    <style>
+      form {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        max-width: 400px;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+      }
+      th,
+      td {
+        border: 1px solid black;
+        padding: 8px;
+        text-align: left;
+      }
+      th {
+        background-color: #f2f2f2;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Sales Journal</h1>
+    <form id="form">
+      <label for="folio">Folio</label>
+      <input type="text" readonly id="folio" name="folio" />
+      <label for="date">Sales Date</label>
+      <input type="date" id="date" name="date" required />
+      <label for="customer">Customer</label>
+      <input
+        type="text"
+        id="customer"
+        name="customer"
+        placeholder="e.g Monicah Koina"
+      />
+      <label for="item">Item name</label>
+      <input type="text" id="item" name="item" placeholder="Amaize flour" />
+      <label for="quantity">Item Quantity</label>
+      <input type="text" id="quantity" name="quantity" placeholder="e.g 2kg" />
+      <label for="amount">Amount</label>
+      <input type="number" name="amount" id="amount" placeholder="e.g 20,000" />
+      <button type="submit">Save Sale</button>
+    </form>
+    <div id="tableContainer"></div>
+    <script>
+      let form = document.getElementById("form");
+      let folio = document.getElementById("folio");
+      let date = document.getElementById("date");
+      let customer = document.getElementById("customer");
+      let itemName = document.getElementById("item");
+      let quantity = document.getElementById("quantity");
+      let amount = document.getElementById("amount");
+      let tableContainer = document.getElementById("tableContainer");
+      let table;
+      let initialFolioNumber = 1;
+      function updateFolioNumber(counter) {
+        return "Sl " + String(counter).padStart(3, "0");
+      }
+      form.addEventListener("submit", function (e) {
+        e.preventDefault();
+        if (!table) {
+          table = document.createElement("table");
+          table.border = "1";
+          let thead = document.createElement("thead");
+          let headerRow = document.createElement("tr");
+          [
+            "Folio",
+            "Date",
+            "Customer",
+            "Item Name",
+            "Item Quantity",
+            "Amount",
+          ].forEach((headerText) => {
+            let th = document.createElement("th");
+            th.textContent = headerText;
+            headerRow.appendChild(th);
+          });
+          thead.appendChild(headerRow);
+          table.appendChild(thead);
+          let tbody = document.createElement("tbody");
+          table.appendChild(tbody);
+          tableContainer.appendChild(table);
+        }
+        let counterFolio = updateFolioNumber(initialFolioNumber++);
+        folio.value = counterFolio;
+        let row = document.createElement("tr");
+        [
+          counterFolio,
+          date.value,
+          customer.value,
+          itemName.value,
+          quantity.value,
+          amount.value,
+        ].forEach((item) => {
+          let td = document.createElement("td");
+          td.textContent = item;
+          row.appendChild(td);
+        });
+        table.querySelector("tbody").appendChild(row);
+        form.reset();
+      });
+    </script>
+  </body>
+</html>
