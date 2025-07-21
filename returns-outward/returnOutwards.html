@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Return Outwards Journal</title>
+  </head>
+  <body>
+    <form id="returnForm">
+      <label for="purchaseSelect">Select Purchase</label>
+      <select id="purchaseSelect" required>
+        <option value="">Choose a purchase</option>
+      </select>
+      <label for="returnQuantity">Quantity Returned</label>
+      <input type="number" id="returnQuantity" required placeholder="e.g. 3" />
+      <label for="reason">Reason for Return</label>
+      <input
+        type="text"
+        id="reason"
+        required
+        placeholder="e.g. Damaged goods"
+      />
+      <label for="returnDate">Return Date</label>
+      <input type="date" id="returnDate" required />
+      <button type="submit">Submit Return</button>
+    </form>
+    <div id="returnTableContainer"></div>
+    <script>
+      const purchaseSelect = document.getElementById("purchaseSelect");
+      const returnForm = document.getElementById("returnForm");
+      const returnTableContainer = document.getElementById(
+        "returnTableContainer"
+      );
+      const purchases = JSON.parse(localStorage.getItem("purchases")) || [];
+      purchases.forEach((purchase, index) => {
+        const option = document.createElement("option");
+        option.value = index;
+        option.textContent = `${purchase.supplier} - ${purchase.good} (Qty: ${purchase.quantity})`;
+        purchaseSelect.appendChild(option);
+      });
+      returnForm.addEventListener("submit", (e) => {
+        e.preventDefault();
+        const selectedIndex = purchaseSelect.value;
+        const returnQty = parseInt(
+          document.getElementById("returnQuantity").value
+        );
+        const reason = document.getElementById("reason").value;
+        const returnDate = document.getElementById("returnDate").value;
+        const originalPurchase = purchases[selectedIndex];
+        if (!originalPurchase) {
+          alert("Invalid purchase selected!");
+          return;
+        }
+        const returnEntry = {
+          returnId: "RT" + crypto.randomUUID().slice(0, 6),
+          supplier: originalPurchase.supplier,
+          good: originalPurchase.good,
+          originalQty: originalPurchase.quantity,
+          returnedQty: returnQty,
+          reason,
+          returnDate,
+          referenceFolio: originalPurchase.id,
+        };
+        const existingReturns =
+          JSON.parse(localStorage.getItem("returnsOutwards")) || [];
+        existingReturns.push(returnEntry);
+        localStorage.setItem(
+          "returnsOutwards",
+          JSON.stringify(existingReturns)
+        );
+        alert("Return saved!");
+        showReturns();
+        returnForm.reset();
+      });
+      function showReturns() {
+        const returns =
+          JSON.parse(localStorage.getItem("returnsOutwards")) || [];
+        if (returns.length === 0) {
+          returnTableContainer.innerHTML = "<p>No returns recorded yet.</p>";
+          return;
+        }
+        const table = document.createElement("table");
+        const thead = document.createElement("thead");
+        thead.innerHTML = `
+          <tr>
+            <th>Return ID</th>
+            <th>Supplier</th>
+            <th>Good</th>
+            <th>Returned Qty</th>
+            <th>Reason</th>
+            <th>Date</th>
+            <th>Reference Folio</th>
+          </tr>
+        `;
+        const tbody = document.createElement("tbody");
+
+        returns.forEach((r) => {
+          const tr = document.createElement("tr");
+          tr.innerHTML = `
+            <td>${r.returnId}</td>
+            <td>${r.supplier}</td>
+            <td>${r.good}</td>
+            <td>${r.returnedQty}</td>
+            <td>${r.reason}</td>
+            <td>${r.returnDate}</td>
+            <td>${r.referenceFolio}</td>
+          `;
+          tbody.appendChild(tr);
+        });
+
+        table.appendChild(thead);
+        table.appendChild(tbody);
+        returnTableContainer.innerHTML = "";
+        returnTableContainer.appendChild(table);
+      }
+      showReturns();
+    </script>
+  </body>
+</html>

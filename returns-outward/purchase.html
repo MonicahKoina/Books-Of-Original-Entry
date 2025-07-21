@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>purchase day book</title>
+    <style>
+      form {
+        display: flex;
+        flex-direction: column;
+        max-width: 260px;
+      }
+    </style>
+  </head>
+
+  <body>
+    <form id="form">
+      <label for="folio">Folio</label>
+      <input type="text" readonly id="folio" name="folio" required />
+      <label for="date">Date</label>
+      <input type="date" id="date" name="date" required />
+      <label for="supplier">Supplier</label>
+      <input
+        type="text"
+        id="supplier"
+        name="supplier"
+        id="supplier"
+        placeholder="e.g. Monicah Mugure"
+        required
+      />
+      <label for="good">Goods</label>
+      <input
+        type="text"
+        id="good"
+        name="good"
+        placeholder="e.g. Matchbox"
+        required
+      />
+      <label for="quantity">Quantity</label>
+      <input
+        type="number"
+        id="quantity"
+        name="quantity"
+        placeholder="e.g 20"
+        required
+      />
+      <label for="buyingPrice">Buying Price</label>
+      <input
+        type="number"
+        id="buyingPrice"
+        name="buyingPrice"
+        placeholder="e.g. 500"
+        required
+      />
+      <button type="submit">Save purchase</button>
+      <div id="tableContainer"></div>
+    </form>
+    <script>
+      let form = document.getElementById("form");
+      let folio = document.getElementById("folio");
+      let date = document.getElementById("date");
+      let supplier = document.getElementById("supplier");
+      let good = document.getElementById("good");
+      let quantity = document.getElementById("quantity");
+      let buyingPrice = document.getElementById("buyingPrice");
+      let tableContainer = document.getElementById("tableContainer");
+
+      folio.value = "PL " + crypto.randomUUID().slice(0, 8);
+
+      form.addEventListener("submit", function (e) {
+        e.preventDefault();
+        let table = document.createElement("table");
+        let thead = document.createElement("thead");
+        let headerRow = document.createElement("tr");
+        [
+          "FOLIO",
+          "DATE",
+          "SUPPLIER",
+          "GOOD",
+          "QUANTITY",
+          "BUYING PRICE",
+        ].forEach((header) => {
+          let th = document.createElement("th");
+          th.textContent = header;
+          headerRow.appendChild(th);
+        });
+        thead.appendChild(headerRow);
+        table.appendChild(thead);
+        let tbody = document.createElement("tbody");
+        table.appendChild(tbody);
+        let row = document.createElement("tr");
+        [
+          folio.value,
+          date.value,
+          supplier.value,
+          good.value,
+          quantity.value,
+          buyingPrice.value,
+        ].forEach((data) => {
+          let td = document.createElement("td");
+          td.textContent = data;
+          row.appendChild(td);
+        });
+        tbody.appendChild(row);
+        tableContainer.innerHTML = "";
+        tableContainer.appendChild(table);
+        let store = {
+          id: folio.value,
+          date: date.value,
+          supplier: supplier.value,
+          good: good.value,
+          quantity: quantity.value,
+          buyingPrice: buyingPrice.value,
+        };
+        let existing = JSON.parse(localStorage.getItem("purchases")) || [];
+        existing.push(store);
+        localStorage.setItem("purchases", JSON.stringify(existing));
+        // localStorage.setItem("purchase", JSON.stringify(store));
+      });
+    </script>
+  </body>
+</html>
